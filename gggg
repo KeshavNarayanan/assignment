@@ -1,0 +1,1526 @@
+App
+
+import React, { useState } from "react";
+import PersonalInfo from "./components/userstory3/PersonalInfo";
+import EmploymentInfo from "./components/userstory3/EmploymentInfo";
+import ExistingLoans from "./components/userstory3/ExistingLoans";
+import DocumentsUpload from "./components/userstory3/DocumentsUpload";
+import LoanDetails from "./components/userstory3/LoanDetails";
+import ReviewApplication from "./components/userstory3/ReviewApplication";
+import Navbar from "./components/userstory3/navigation";
+import Sidebar from "./components/userstory3/Sidebar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+//import './components/userstory3/whole.css';
+
+function App() {
+  const [step, setStep] = useState(1);
+  const [errors, setErrors] = useState({});
+
+  const [formData, setFormData] = useState({
+  fullName: "",
+  phone: "",
+  email: "",
+  address: "",
+  dob: "",
+  age: "",
+  maritalStatus: "",
+  gender: "",
+  aadharNumber: "",
+  panNumber: "",
+  passportNumber: "",
+  fatherName: "",
+  highestQualification: "",
+  status: "",
+  employer: "",
+  jobTitle: "",
+  income: "",
+  yearsAtEmployer: "",
+  hasLoans: "",
+  loanType: "",
+  payment: "",
+  balance: "",
+  lender: "",
+  amount: "",
+  term: "",
+  purpose: "",
+  property: "",
+  downPayment: ""
+});
+
+  const [user] = useState({ name: "user" }); // Dummy user for demo
+
+  const validateStep = () => {
+    const newErrors = {};
+
+    switch (step) {
+      case 1:
+        if (!formData.fullName) newErrors.fullName = "Required";
+        if (!formData.phone) newErrors.phone = "Required";
+        if (!formData.email) newErrors.email = "Required";
+        if (!formData.address) newErrors.address = "Required";
+        if (!formData.dob) newErrors.dob = "Required";
+        if (!formData.maritalStatus) newErrors.maritalStatus = "Required";
+        if (!formData.gender) newErrors.gender = "Required";
+        if (!formData.aadharNumber) newErrors.aadharNumber = "Required";
+        if (!formData.panNumber) newErrors.panNumber = "Required";
+        if (!formData.fatherName) newErrors.fatherName = "Required";
+        if (!formData.highestQualification) newErrors.highestQualification = "Required";
+        break;
+      case 2:
+        if (!formData.status) newErrors.status = "Required";
+        if (!formData.employer) newErrors.employer = "Required";
+        if (!formData.jobTitle) newErrors.jobTitle = "Required";
+        if (!formData.income) newErrors.income = "Required";
+        if (!formData.yearsAtEmployer) newErrors.yearsAtEmployer = "Required";
+        break;
+      case 3:
+        if (!formData.hasLoans) newErrors.hasLoans = "Required";
+        if (formData.hasLoans === "Yes") {
+          if (!formData.loanType) newErrors.loanType = "Required";
+          if (!formData.payment) newErrors.payment = "Required";
+          if (!formData.balance) newErrors.balance = "Required";
+          if (!formData.lender) newErrors.lender = "Required";
+        }
+        break;
+      case 5:
+        if (!formData.amount) newErrors.amount = "Required";
+        if (!formData.term) newErrors.term = "Required";
+        if (!formData.purpose) newErrors.purpose = "Required";
+        break;
+      default:
+        break;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    if (validateStep()) setStep(step + 1);
+  };
+  const prevStep = () => setStep(step - 1);
+
+  const renderStep = () => {
+    
+    switch (step) {
+      case 1:
+        return (
+          <PersonalInfo
+            formData={formData}
+            setFormData={setFormData}
+            nextStep={nextStep}
+            errors={errors}
+          />
+        );
+      case 2:
+        return (
+          <EmploymentInfo
+            formData={formData}
+            setFormData={setFormData}
+            nextStep={nextStep}
+            prevStep={prevStep}
+            errors={errors}
+          />
+        );
+      case 3:
+        return (
+          <ExistingLoans
+            formData={formData}
+            setFormData={setFormData}
+            nextStep={nextStep}
+            prevStep={prevStep}
+            errors={errors}
+          />
+        );
+      case 4:
+        return <DocumentsUpload nextStep={nextStep} prevStep={prevStep} />;
+      case 5:
+        return (
+          <LoanDetails
+            formData={formData}
+            setFormData={setFormData}
+            nextStep={nextStep}
+            prevStep={prevStep}
+            errors={errors}
+          />
+        );
+      case 6:
+        return <ReviewApplication formData={formData} prevStep={prevStep} />;
+      default:
+        return <h2>Application Submitted Successfully!</h2>;
+    }
+  };
+
+  const progressTitles = [
+    "Personal Info",
+    "Employment",
+    "Existing Loans",
+    "Documents",
+    "Loan Details",
+    "Review"
+  ];
+
+  return (
+    <Router>
+      
+      <Navbar user={user} />
+      <div className="app-container">
+        <h1 className="main-title">Loan Application Form</h1>
+        <div className="step-progress">
+          {progressTitles.map((title, index) => (
+            <div
+              key={index}
+              className={`progress-step ${step === index + 1 ? "active" : ""} ${
+                step > index + 1 ? "completed" : ""
+              }`}
+            >
+              <span className="step-number">{index + 1}</span>
+              <p className="step-label"></p>
+              <p>{title}</p>
+            </div>
+          ))}
+        </div>
+        {renderStep()}
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+
+
+
+
+EMployment info
+
+import React from "react";
+import "./LoanForm.css";
+
+const EmploymentInfo = ({ formData, setFormData, nextStep, prevStep, errors }) => (
+  <div className="form-container">
+    <h2>Employment Information</h2>
+    <p>Tell us about your employment</p>
+
+    <div className="form-grid">
+      <div>
+        <label>Employment Status</label>
+        <select
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+        >
+          <option value="">Select</option>
+          <option>Full-time Employed</option>
+          <option>Part-time Employed</option>
+          <option>Self-employed</option>
+          <option>Retired</option>
+          <option>Unemployed</option>
+        </select>
+        {errors.status && <span className="error-text">{errors.status}</span>}
+      </div>
+
+      <div>
+        <label>Employer Name</label>
+        <input
+          type="text"
+          value={formData.employer}
+          onChange={(e) => setFormData({ ...formData, employer: e.target.value })}
+        />
+        {errors.employer && <span className="error-text">{errors.employer}</span>}
+      </div>
+
+      <div>
+        <label>Job Title</label>
+        <input
+          type="text"
+          value={formData.jobTitle}
+          onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+        />
+        {errors.jobTitle && <span className="error-text">{errors.jobTitle}</span>}
+      </div>
+
+      <div>
+        <label>Annual Income</label>
+        <input
+          type="number"
+          value={formData.income}
+          onChange={(e) => setFormData({ ...formData, income: e.target.value })}
+        />
+        {errors.income && <span className="error-text">{errors.income}</span>}
+      </div>
+
+      <div>
+        <label>Years at Current Employer</label>
+        <input
+          type="number"
+          value={formData.yearsAtEmployer}
+          onChange={(e) => setFormData({ ...formData, yearsAtEmployer: e.target.value })}
+        />
+        {errors.yearsAtEmployer && <span className="error-text">{errors.yearsAtEmployer}</span>}
+      </div>
+    </div>
+
+    <div className="btn-group">
+      <button onClick={prevStep}>← Back</button>
+      <button className="next-btn" onClick={nextStep}>Next →</button>
+    </div>
+  </div>
+);
+
+export default EmploymentInfo;
+
+
+Exist
+
+import React from "react";
+import "./LoanForm.css";
+
+const ExistingLoans = ({ formData, setFormData, nextStep, prevStep, errors }) => (
+  <div className="form-container">
+    <h2>Existing Loans</h2>
+    <p>Tell us about any existing loans you have</p>
+
+    <label>Do you have any existing loans?</label>
+    <select
+      value={formData.hasLoans}
+      onChange={(e) => setFormData({ ...formData, hasLoans: e.target.value })}
+    >
+      <option value="">Select</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+    {errors.hasLoans && <span className="error-text">{errors.hasLoans}</span>}
+
+    {formData.hasLoans === "Yes" && (
+      <div className="form-grid">
+        <div>
+          <label>Loan Type</label>
+          <input
+            type="text"
+            value={formData.loanType}
+            onChange={(e) => setFormData({ ...formData, loanType: e.target.value })}
+          />
+          {errors.loanType && <span className="error-text">{errors.loanType}</span>}
+        </div>
+
+        <div>
+          <label>Monthly Payment</label>
+          <input
+            type="number"
+            value={formData.payment}
+            onChange={(e) => setFormData({ ...formData, payment: e.target.value })}
+          />
+          {errors.payment && <span className="error-text">{errors.payment}</span>}
+        </div>
+
+        <div>
+          <label>Outstanding Balance</label>
+          <input
+            type="number"
+            value={formData.balance}
+            onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
+          />
+          {errors.balance && <span className="error-text">{errors.balance}</span>}
+        </div>
+
+        <div>
+          <label>Lender Name</label>
+          <input
+            type="text"
+            value={formData.lender}
+            onChange={(e) => setFormData({ ...formData, lender: e.target.value })}
+          />
+          {errors.lender && <span className="error-text">{errors.lender}</span>}
+        </div>
+      </div>
+    )}
+
+    <div className="btn-group">
+      <button onClick={prevStep}>← Back</button>
+      <button className="next-btn" onClick={nextStep}>Next →</button>
+    </div>
+  </div>
+);
+
+export default ExistingLoans;
+
+
+
+Loan
+
+import React from "react";
+import "./LoanForm.css";
+
+const LoanDetails = ({ formData, setFormData, nextStep, prevStep, errors }) => (
+  <div className="form-container">
+    <h2>Loan Details</h2>
+    <p>Specify your loan requirements</p>
+
+    <div className="form-grid">
+      <div>
+        <label>Loan Amount</label>
+        <input
+          type="number"
+          value={formData.amount}
+          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+        />
+        {errors.amount && <span className="error-text">{errors.amount}</span>}
+      </div>
+
+      <div>
+        <label>Loan Term (years)</label>
+        <input
+          type="number"
+          value={formData.term}
+          onChange={(e) => setFormData({ ...formData, term: e.target.value })}
+        />
+        {errors.term && <span className="error-text">{errors.term}</span>}
+      </div>
+
+      <div>
+        <label>Loan Purpose</label>
+        <input
+          type="text"
+          value={formData.purpose}
+          onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+        />
+        {errors.purpose && <span className="error-text">{errors.purpose}</span>}
+      </div>
+
+      <div>
+        <label>Property Value (Optional)</label>
+        <input
+          type="number"
+          value={formData.property}
+          onChange={(e) => setFormData({ ...formData, property: e.target.value })}
+        />
+      </div>
+
+      <div>
+        <label>Down Payment (Optional)</label>
+        <input
+          type="number"
+          value={formData.downPayment}
+          onChange={(e) => setFormData({ ...formData, downPayment: e.target.value })}
+        />
+      </div>
+    </div>
+
+    <div className="btn-group">
+      <button onClick={prevStep}>← Back</button>
+      <button className="next-btn" onClick={nextStep}>Next →</button>
+    </div>
+  </div>
+);
+
+export default LoanDetails;
+
+
+
+
+
+Css
+
+/* ===== Global Page Styles ===== */
+body {
+  background: radial-gradient(circle at 20% 50%, #00bfa6 20%, #014eb2);
+  font-family: "Inter", "Segoe UI", sans-serif;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  max-width: 900px;
+  margin: 3rem auto;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 2rem 3rem;
+}
+
+/* ===== Header ===== */
+.main-title {
+  text-align: center;
+  color: #004aad;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+/* ===== Progress Bar ===== */
+.step-progress {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 28px;
+  margin-bottom: 2.5rem;
+  flex-wrap: nowrap !important;
+}
+
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.progress-step {
+  flex: 1 1 0;
+  min-width: 100px;
+  text-align: center;
+  position: relative;
+}
+
+.step-number {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 50%;
+  background-color: #d1e3ff;
+  color: #004aad;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  transition: 0.3s ease;
+}
+
+.progress-step.active .step-number {
+  background-color: #004aad;
+  color: #fff;
+}
+
+.progress-step.completed .step-number {
+  background-color: #00bfa6;
+  color: #fff;
+}
+
+.progress-step p {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.progress-step .step-number {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #d1e3ff;
+  color: #004aad;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.progress-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 18px;            
+  right: -14px;
+  width: 28px;
+  height: 2px;
+  background: #cfe2ff;
+}
+
+
+/* ===== Form Containers ===== */
+.form-container {
+  background: #fdfdfd;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  color: #004aad;
+  margin-bottom: 0.3rem;
+}
+
+p {
+  color: #555;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* ===== Form Layout ===== */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  column-gap: 2rem;  /* horizontal space between fields */
+  row-gap: 1.5rem;   /* vertical space between rows */
+  align-items: start;
+  input, select, textarea {padding: 0.9rem;}
+}
+
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #333;
+}
+
+/* ===== Inputs & Selects ===== */
+input,
+select {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #00bfa6;
+  box-shadow: 0 0 4px rgba(0, 191, 166, 0.4);
+}
+
+/* ===== Buttons ===== */
+.next-btn,
+.submit-btn {
+  background: linear-gradient(90deg, #004aad, #00bfa6);
+  color: #fff;
+  padding: 0.9rem 1.7rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.next-btn:hover,
+.submit-btn:hover {
+  opacity: 0.9;
+}
+
+.btn-group {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  background: none;
+  border: none;
+  color: #004aad;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  text-decoration: underline;
+}
+
+/* ===== Upload Box ===== */
+.upload-box {
+  border: 2px dashed #b3b3b3;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  color: #555;
+  background-color: #fafafa;
+  margin-bottom: 1rem;
+}
+
+.upload-box input[type="file"] {
+  margin-bottom: 1rem;
+}
+
+/* ===== Review Section ===== */
+.review-section {
+  line-height: 1.8;
+  color: #333;
+  margin-top: 1rem;
+  background: #fafcff;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* ===== Error Messages ===== */
+.error-text {
+  color: #d60000;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-title {
+    font-size: 1.5rem;
+  }
+
+  .next-btn,
+  .submit-btn {
+    width: 100%;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.navbar-custom {
+  background: linear-gradient(90deg, #0b5fcd, #00bfa6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-custom .navbar-brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.navbar-custom .btn-outline-light {
+  border-color: #ffffff;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item:hover {
+  background-color: #fff;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #00bfa6;
+  box-shadow: 0 0 4px rgba(0, 191, 166, 0.4);
+}   
+
+.review-section {
+  background: #a6cbfc;
+  border: 1px solid #e0e7ff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.review-section h3 {
+  color: #004aad;
+  margin-top: 0;
+}
+
+.review-section p {
+  margin: 0.4rem 0;
+  color: #333;
+}
+
+.review-section hr {
+  border: none;
+  border-top: 1px solid #dce4f0;
+  margin: 0.8rem 0 1rem 0;
+}
+
+.navbar-custom {
+  background: white;
+  color: #fff !important;
+  padding: 0.6rem 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .text-light {
+  color: #000000 !important;
+}
+
+.navbar-custom .btn-outline-light {
+  border-color: #000000;
+  color: #000000;
+  font-weight: 500;
+}
+
+.navbar-custom .btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-menu {
+  background-color: #fff;
+  border-radius: 8px;
+  min-width: 180px;
+}
+
+.dropdown-item {
+  color: #004aad !important;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background-color: #f2f8ff;
+}
+
+.dropdown-item.text-danger {
+  color: #d32f2f !important;
+}
+
+.stepper-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap !important;
+  gap: 40px;
+  margin: 30px 0;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.step {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.step-number {
+  background-color: #dceeff;
+  color: #004aad;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.step-number.active {
+  background-color: #004aad;
+  color: #fff;
+}
+
+.step-label {
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Optional connector line between steps */
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: -45px;
+  width: 60px;
+  height: 2px;
+  background-color: #bcd9ff;
+  z-index: 0;
+}
+
+.dashboard-container {
+  display: flex;
+  justify-content: center;  /* horizontally center */
+  align-items: center;      /* vertically center */
+  min-height: 100vh;        /* full viewport height */
+  background-color: #f8f9fa; /* optional background for contrast */
+}
+
+.form-container {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.card-custom {
+  border: none;
+  border-radius: 8px;
+}
+
+.progress {
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar.bg-primary {
+  background-color: #0d6efd;
+  transition: width 0.3s ease;
+  height: 6px;
+}
+
+.form-step h5 {
+  font-weight: 600;
+  color: #212529;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  font-size: 0.85rem;
+  color: #dc3545;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.form-check-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+d-flex.gap-3 > div {
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-primary-custom {
+  background-color: #0d6efd;
+  border: none;
+  padding: 10px 24px;
+  font-weight: 600;
+  border-radius: 4px;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary-custom:hover:not(:disabled) {
+  background-color: #0b5ed7;
+}
+
+.btn-secondary-custom {
+  background-color: #6c757d;
+  border: none;
+  padding: 10px 24px;
+  font-weight: 600;
+  border-radius: 4px;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary-custom:hover:not(:disabled) {
+  background-color: #565e64;
+}
+
+.btn-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.document-upload {
+  cursor: pointer;
+  border: 2px dashed #0d6efd;
+  border-radius: 6px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #0d6efd;
+  transition: background-color 0.3s ease;
+}
+
+.document-upload:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.list-group-item {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  padding: 15px 20px;
+  background: #fff;
+}
+
+.list-group-item strong {
+  font-weight: 600;
+}
+
+.list-group-item small {
+  color: #6c757d;
+}
+
+.list-group-item .fas.fa-check-circle {
+  font-size: 1.2rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.border-primary {
+  border-color: #0d6efd !important;
+}
+
+.border-start {
+  border-left-width: 6px !important;
+}
+
+.summary-item {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.summary-item label {
+  font-weight: 600;
+}
+
+.text-primary {
+  color: #0d6efd !important;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+/* Spinner tweaks */
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .form-container {
+    padding: 20px;
+  }
+
+  .btn-primary-custom,
+  .btn-secondary-custom {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Layout wrapper */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main area below navbar */
+.main-layout {
+  display: flex;
+  flex-grow: 1;
+  background-color: #f9f9f9;
+}
+
+/* Sidebar section (on left) */
+.sidebar {
+  width: 230px;
+  min-height: calc(100vh - 60px); /* Adjust based on navbar height */
+  background: linear-gradient(180deg, #004aad, #00bfa6);
+  color: white;
+  padding: 20px 10px;
+  position: relative;
+}
+
+/* Sidebar links */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-link {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  text-align: left;
+  font-size: 15px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-link.active {
+  background: linear-gradient(90deg, #007b5f, #00bfa6);
+  font-weight: 600;
+}
+
+/* Right content section */
+.page-content {
+  flex-grow: 1;
+  padding: 30px;
+  background-color: #fff;
+  min-height: calc(100vh - 60px);
+}
+
+
+
+
+Nav
+
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+const Navbar = ({ user }) => {
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.removeItem("loanApplications");
+      localStorage.removeItem("userProfile");
+      alert("Logged out successfully!");
+      navigate("/Login");
+    }
+  };
+
+  // ✅ Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <nav className="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+      <div className="container-fluid d-flex justify-content-between align-items-center">
+        {/* Left Section */}
+        <button
+          className="navbar-brand btn btn-link text-decoration-none text-white fs-5 fw-bold"
+          onClick={() => navigate("/Login")}
+        >
+          <i className="fas fa-landmark me-2"></i>
+          Standard Chartered
+        </button>
+
+        {/* Right Section */}
+        <div
+          className="d-flex align-items-center gap-3 position-relative"
+          ref={dropdownRef}
+        >
+          <span className="text-light fw-semibold">
+            Welcome, {user.name || "User"}
+          </span>
+
+          <button
+            className="btn btn-outline-light btn-sm d-flex align-items-center"
+            onClick={() => setShowDropdown(!showDropdown)}
+          >
+            <i className="fas fa-user-circle me-2"></i>
+            Profile
+            <i className="fas fa-chevron-down ms-2"></i>
+          </button>
+
+          {showDropdown && (
+            <div
+              className="dropdown-menu show shadow-sm border-0"
+              style={{
+                position: "absolute",
+                top: "100%",
+                right: 0,
+                minWidth: "190px",
+                zIndex: 2000,
+                borderRadius: "8px",
+              }}
+            >
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  navigate("/profile");
+                  setShowDropdown(false);
+                }}
+              >
+                <i className="fas fa-user me-2"></i>View Profile
+              </button>
+
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  navigate("/applications");
+                  setShowDropdown(false);
+                }}
+              >
+                <i className="fas fa-list me-2"></i>My Applications
+              </button>
+
+              <hr className="dropdown-divider" />
+
+              <button
+                className="dropdown-item text-danger"
+                onClick={handleLogout}
+              >
+                <i className="fas fa-sign-out-alt me-2"></i>Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+
+
+
+Personal
+
+import React, { useEffect } from "react";
+import "./LoanForm.css";
+
+const PersonalInfo = ({ formData, setFormData, nextStep, errors }) => {
+  
+  // Automatically calculate age when DOB changes
+  useEffect(() => {
+    if (formData.dob) {
+      const birthDate = new Date(formData.dob);
+      const ageDiff = Date.now() - birthDate.getTime();
+      const ageDate = new Date(ageDiff);
+      const calculatedAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+      setFormData({ ...formData, age: calculatedAge });
+    }
+    // eslint-disable-next-line
+  }, [formData.dob]);
+
+  return (
+    <div className="form-container">
+      <h2>Personal Information</h2>
+      <p>Please provide your personal details</p>
+
+      <div className="form-grid">
+        <div>
+          <label>Full Name</label>
+          <input
+            type="text"
+            value={formData.fullName || ""}
+            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+          />
+          {errors.fullName && <span className="error-text">{errors.fullName}</span>}
+        </div>
+
+        <div>
+          <label>Phone Number</label>
+          <input
+            type="tel"
+            maxLength="10"
+            value={formData.phone || ""}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          />
+          {errors.phone && <span className="error-text">{errors.phone}</span>}
+        </div>
+
+        <div>
+          <label>Email</label>
+          <input
+            type="email"
+            value={formData.email || ""}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+          {errors.email && <span className="error-text">{errors.email}</span>}
+        </div>
+
+        <div>
+          <label>Address</label>
+          <textarea
+            rows="3"
+            value={formData.address || ""}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          />
+          {errors.address && <span className="error-text">{errors.address}</span>}
+        </div>
+
+        <div>
+          <label>Date of Birth</label>
+          <input
+            type="date"
+            value={formData.dob || ""}
+            onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+          />
+          {errors.dob && <span className="error-text">{errors.dob}</span>}
+        </div>
+
+        <div>
+          <label>Age</label>
+          <input type="number" value={formData.age || ""} readOnly disabled />
+        </div>
+
+        <div>
+          <label>Marital Status</label>
+          <select
+            value={formData.maritalStatus || ""}
+            onChange={(e) => setFormData({ ...formData, maritalStatus: e.target.value })}
+          >
+            <option value="">Select</option>
+            <option>Single</option>
+            <option>Married</option>
+            <option>Divorced</option>
+            <option>Widowed</option>
+          </select>
+          {errors.maritalStatus && <span className="error-text">{errors.maritalStatus}</span>}
+        </div>
+
+        <div>
+          <label>Gender</label>
+          <select
+            value={formData.gender || ""}
+            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+          >
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+          {errors.gender && <span className="error-text">{errors.gender}</span>}
+        </div>
+
+        <div>
+          <label>Aadhar Number</label>
+          <input
+            type="text"
+            maxLength="12"
+            value={formData.aadharNumber || ""}
+            onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
+          />
+          {errors.aadharNumber && <span className="error-text">{errors.aadharNumber}</span>}
+        </div>
+
+        <div>
+          <label>PAN Number</label>
+          <input
+            type="text"
+            maxLength="10"
+            value={formData.panNumber || ""}
+            onChange={(e) => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })}
+          />
+          {errors.panNumber && <span className="error-text">{errors.panNumber}</span>}
+        </div>
+
+        <div>
+          <label>Passport Number (Optional)</label>
+          <input
+            type="text"
+            maxLength="8"
+            value={formData.passportNumber || ""}
+            onChange={(e) => setFormData({ ...formData, passportNumber: e.target.value.toUpperCase() })}
+          />
+        </div>
+
+        <div>
+          <label>Father’s Name</label>
+          <input
+            type="text"
+            value={formData.fatherName || ""}
+            onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+          />
+          {errors.fatherName && <span className="error-text">{errors.fatherName}</span>}
+        </div>
+
+        <div>
+          <label>Highest Qualification</label>
+          <select
+            value={formData.highestQualification || ""}
+            onChange={(e) => setFormData({ ...formData, highestQualification: e.target.value })}
+          >
+            <option value="">Select</option>
+            <option>High School</option>
+            <option>Diploma</option>
+            <option>Bachelor’s Degree</option>
+            <option>Master’s Degree</option>
+            <option>Ph.D</option>
+          </select>
+          {errors.highestQualification && (
+            <span className="error-text">{errors.highestQualification}</span>
+          )}
+        </div>
+      </div>
+
+      <button className="next-btn" onClick={nextStep}>
+        Next →
+      </button>
+    </div>
+  );
+};
+
+export default PersonalInfo;
+
+
+
+
+Reviw
+
+import React from "react";
+import "./LoanForm.css";
+
+const ReviewApplication = ({ formData, prevStep }) => {
+
+  const handleSubmit = () => {
+    // Simple validation check before submission
+    if (window.confirm("Do you want to submit your application?")) {
+      alert("Form submitted successfully!");
+      // In a real app, you’d send this data to a backend API here
+      window.location.reload(); // resets form & returns to start
+    }
+  };
+
+  return (
+    <div className="form-container">
+      <h2>Review Your Application</h2>
+      <p>Please review your information before submitting</p>
+
+      {/* ================= Personal Info Section ================= */}
+      <div className="review-section">
+        <h3>Personal Information</h3>
+        <hr />
+        <p><strong>Full Name:</strong> {formData.fullName}</p>
+        <p><strong>Phone:</strong> {formData.phone}</p>
+        <p><strong>Email:</strong> {formData.email}</p>
+        <p><strong>Address:</strong> {formData.address}</p>
+        <p><strong>Date of Birth:</strong> {formData.dob}</p>
+        <p><strong>Age:</strong> {formData.age}</p>
+        <p><strong>Marital Status:</strong> {formData.maritalStatus}</p>
+        <p><strong>Gender:</strong> {formData.gender}</p>
+        <p><strong>Aadhar Number:</strong> {formData.aadharNumber}</p>
+        <p><strong>PAN Number:</strong> {formData.panNumber}</p>
+        {formData.passportNumber && (
+          <p><strong>Passport Number:</strong> {formData.passportNumber}</p>
+        )}
+        <p><strong>Father’s Name:</strong> {formData.fatherName}</p>
+        <p><strong>Highest Qualification:</strong> {formData.highestQualification}</p>
+      </div>
+
+      {/* ================= Employment Info Section ================= */}
+      <div className="review-section">
+        <h3>Employment Information</h3>
+        <hr />
+        <p><strong>Status:</strong> {formData.status}</p>
+        <p><strong>Employer:</strong> {formData.employer}</p>
+        <p><strong>Job Title:</strong> {formData.jobTitle}</p>
+        <p><strong>Annual Income:</strong> ₹{formData.income}</p>
+        <p><strong>Years at Employer:</strong> {formData.yearsAtEmployer}</p>
+      </div>
+
+      {/* ================= Existing Loans Section ================= */}
+      <div className="review-section">
+        <h3>Existing Loans</h3>
+        <hr />
+        <p><strong>Do you have loans?</strong> {formData.hasLoans}</p>
+        {formData.hasLoans === "Yes" && (
+          <>
+            <p><strong>Loan Type:</strong> {formData.loanType}</p>
+            <p><strong>Monthly Payment:</strong> ₹{formData.payment}</p>
+            <p><strong>Outstanding Balance:</strong> ₹{formData.balance}</p>
+            <p><strong>Lender Name:</strong> {formData.lender}</p>
+          </>
+        )}
+      </div>
+
+      {/* ================= Loan Details Section ================= */}
+      <div className="review-section">
+        <h3>Loan Details</h3>
+        <hr />
+        <p><strong>Amount:</strong> ₹{formData.amount}</p>
+        <p><strong>Term:</strong> {formData.term} years</p>
+        <p><strong>Purpose:</strong> {formData.purpose}</p>
+        {formData.property && <p><strong>Property Value:</strong> ₹{formData.property}</p>}
+        {formData.downPayment && <p><strong>Down Payment:</strong> ₹{formData.downPayment}</p>}
+      </div>
+
+      {/* ================= Buttons ================= */}
+      <div className="btn-group">
+        <button onClick={prevStep}>← Back</button>
+        <button className="submit-btn" onClick={handleSubmit}>
+          Submit Application
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ReviewApplication;
+
+
+
+
+Sidebar
+
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import './LoanForm.css';
+
+const Sidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuItems = [
+    { path: "/dashboard", label: "Dashboard" },
+    { path: "/apply", label: "Apply for Loan" },
+    { path: "/applications", label: "My Applications" },
+    { path: "/profile", label: "Profile" },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
+  return (
+    <div className="sidebar">
+      <ul className="sidebar-menu">
+        {menuItems.map((item) => (
+          <li key={item.path}>
+            <button
+              className={`sidebar-link ${isActive(item.path) ? "active" : ""}`}
+              onClick={() => navigate(item.path)}
+            >
+              {item.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default Sidebar;
